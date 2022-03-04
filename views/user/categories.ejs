@@ -1,0 +1,48 @@
+<%- include("../layout/navbar") -%>
+
+<div class="category-media">
+    <div class="scrollmenu">
+        <% sideCategory.forEach(data => { %>
+            <a href="/category/<%= cat %>/<%= data.name%>"><%= data.name%></a>
+        <%}) %>
+      </div>
+      <br>
+      <div class="index flex">
+      
+      <% products.forEach(data => {%>
+
+        <div class="card">
+            <img src="/upload/images/<%= data.image%>">
+            <% if(data.isStock == false){%>
+                <p class="out-stock">المنتج غير متوفر</p>
+            <%} %>
+            <p class="card-name">
+                <%= data.name%>
+            </p>
+            <p class="card-description">
+                <%= data.minDes%>
+            </p>
+            <p class="card-price">
+                <%= data.price%><span>IQD</span>
+            </p>
+            <div class="btns">
+                <button class="card-show" onclick="window.location.href='/product/get/<%= data.id%>'">المزيد من المعلومات</button>
+                <% if(userDATA){%>
+                    <% if(data.isStock == true){%>
+                        <form action="/cart/add/<%= data.id%>?_method=PUT" method="post">
+                            <button class="card-add">اضافة الى السلة</button>
+                        </form>
+                    <%} %>
+                    <%}else {%>
+                        <button onclick="addCart('<%= data.id%>')">Add to
+                            cart</button>
+                        <%} %>
+
+            </div>
+        </div>
+        
+    <% })%>
+</div>
+</div>
+
+<%- include("../layout/footer") -%>

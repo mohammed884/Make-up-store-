@@ -1,0 +1,27 @@
+<%- include("../../layout/navbar") -%>
+
+<% if(add.length> 0){%>
+    <script>
+        Swal.fire(
+            'تمت اضافة المنتج الى السلة',
+            '',
+            'success'
+        )
+    </script>
+    <%} %>
+
+<p class="name-of-product"><%= data.name%></p>
+<div class="porduct-media">
+    
+    <img src="/upload/images/<%= data.image%>" alt="">
+    <div class="info">
+        <p class="des"><%= data.des%></p>
+        <p class="brand">الماركة : <%= data.brand%></p>
+        <p class="price"> السعر : <%= data.price%></p>
+        <form action="/cart/add/<%= data.id%>?_method=PUT" method="post">
+            <button class="add-cart">اضافة الى السلة</button>
+        </form>
+    </div>
+</div>
+
+<%- include("../../layout/footer") -%>

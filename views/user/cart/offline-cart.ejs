@@ -1,0 +1,64 @@
+<%- include("../../layout/navbar") -%>
+
+    <div class="cart">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">الصورة</th>
+                    <th scope="col">الاسم</th>
+                    <th scope="col">الماركة</th>
+                    <th scope="col">العدد</th>
+                    <th scope="col">سعر القطعة الواحدة</th>
+                    <th scope="col">السعر النهائي</th>
+                    <th scope="col">حذف</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%- JSON.parse(localStorage.getItem("cart_products")).forEach(data =>{%>
+                    <tr>
+                      <td><img src="/upload/images/<%= data[i].image%>"></td>
+                      <td>
+                        <%= data[i].name%>
+                      </td>
+                      <td>
+                        <%= data[i].brand%>
+                      </td>
+                      <td class="qty"><span name="qty">
+                          <%= data[i].qty%>
+                        </span>
+                        <div class="btns-qty">
+                          <form action="/cart/plus/<%= data[i].name%>?_method=PUT" method="post">
+                            <button>+</button>
+                          </form>
+                          <form action="/cart/min/<%= data[i].name%>?_method=PUT" method="post">
+                            <button>-</button>
+                          </form>
+          
+                        </div>
+                      </td>
+                      <td>
+                        <%= userDATA.cart[i].price%>
+                      </td>
+                      <td id="price">
+                        <%= userDATA.cart[i].qty * userDATA.cart[i].price%>
+                      </td>
+                      <td>
+                        <form action="/cart/delete/<%= userDATA.cart[i].name%>?_method=DELETE" method="post">
+                          <button class="delete"><svg xmlns="http://www.w3.org/2000/svg"
+                              class="icon icon-tabler icon-tabler-trash" width="20" height="20" viewBox="0 0 24 24"
+                              stroke-width="2" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                              <line x1="4" y1="7" x2="20" y2="7" />
+                              <line x1="10" y1="11" x2="10" y2="17" />
+                              <line x1="14" y1="11" x2="14" y2="17" />
+                              <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                              <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                            </svg></button>
+                        </form>
+                      </td>
+                    </tr>
+                    <%})%>
+            </tbody>
+        </table>
+    </div>
+    <%- include("../../layout/footer") -%>

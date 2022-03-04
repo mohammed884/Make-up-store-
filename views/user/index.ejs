@@ -1,0 +1,137 @@
+<%- include("../layout/navbar") -%>
+
+    <% if(addError.length> 0){%>
+        <script>
+            Swal.fire(
+                'تمت اضافة المنتج مسبقا',
+                'تمت اضافة المنتج الى السلة مسبقا',
+                'error'
+            )
+        </script>
+        <%} %>
+
+        <% if(add.length> 0){%>
+            <script>
+                Swal.fire(
+                    'تمت اضافة المنتج الى السلة',
+                    '',
+                    'success'
+                )
+            </script>
+            <%} %>
+
+            <div class="index">
+                <% preview.forEach(element=> {%>
+                    <p class="preview-title">
+                        <%= element.title%>
+                    </p>
+                    <p class="preview-des">
+                        <%= element.des%>
+                    </p>
+                    <br>
+                    <button class="preview-more"
+                        onclick="window.location.href='/category/<%= element.category%>/all'">شاهد المزيد</button>
+                    <div class="scrollmenu">
+
+                        <% product.forEach(data=> {%>
+                            <% if(element.category==data.mainCategory) {%>
+                                <% if(element.type=="card" ){%>
+
+                                    <div class="item">
+
+                                        <div class="card">
+                                            <img src="/upload/images/<%= data.image%>">
+                                            <% if(data.isStock == false){%>
+                                                <p class="out-stock">المنتج غير متوفر</p>
+                                            <%} %>
+                                            <p class="card-name">
+                                                <%= data.name%>
+                                            </p>
+                                            <p class="card-description">
+                                                <%= data.minDes%>
+                                            </p>
+                                            <p class="card-price">
+                                                <%= data.price%><span>IQD</span>
+                                            </p>
+                                            <div class="btns">
+                                                <button class="card-show" onclick="window.location.href='/product/get/<%= data.id%>'">المزيد من المعلومات</button>
+                                                <% if(userDATA){%>
+                                                    <% if(data.isStock == true){%>
+                                                        <form action="/cart/add/<%= data.id%>?_method=PUT" method="post">
+                                                            <button class="card-add">اضافة الى السلة</button>
+                                                        </form>
+                                                    <%} %>
+                                                    
+                                                    <%}else {%>
+                                                        <button onclick="addCart('<%= data.id%>')">Add to
+                                                            cart</button>
+                                                        <%} %>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <%} %>
+
+                                        <%}%>
+                                            <%}) %>
+                    </div>
+
+                    <% if(element.type=="image" ){%>
+                        <div class="wide-img" onclick="window.location.href='/category/<%= element.category%>/all'">
+                            <center><img src="/upload/images/<%= element.image%>" alt=""></center>
+                        </div>
+                        <% } %>
+                            <%}); %>
+            </div>
+
+
+
+            <script>$('.owl-carousel').owlCarousel({
+                    rtl: true,
+                    loop: true,
+                    margin: 0,
+                    nav: true,
+                    responsive: {
+                        0: {
+                            items: 1
+                        },
+                        50: {
+                            items: 2
+                        },
+                        500: {
+                            items: 5
+                        }
+                    }
+                })</script>
+
+            <script>
+                function addCart(id) {
+                    const res = fetch(`http://localhost:3000/cart/data/${id}`, {
+                        headers: { "Content-type": "application/json" }
+                    })
+                        .then(res => res.json())
+                        .then(res => {
+                            const prevData = JSON.parse(localStorage.getItem('cart_products')) || [];
+                            if (prevData.findIndex(data => data._id === id) > -1) {
+                                Swal.fire(
+                                    'تمت اضافة المنتج مسبقا',
+                                    'تمت اضافة المنتج الى السلة مسبقا',
+                                    'error'
+                                )
+                                return;
+                            }
+                            prevData.push({ ...res, qty: 1 });
+                            localStorage.setItem('cart_products', JSON.stringify(prevData))
+                        })
+                        .catch(err => console.log(err))
+
+                }
+            </script>
+
+            <script type="text/javascript"
+                src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+            <script type="text/javascript"
+                src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.2.1/owl.carousel.min.js"></script>
+
+
+            <%- include("../layout/footer") -%>
