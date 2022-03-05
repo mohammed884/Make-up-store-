@@ -24,10 +24,23 @@ router.get('/', async (req, res) => {
         console.error(error)
     }
 })
-
+router.get('/offline', async (req, res) => {
+    const items = JSON.parse(req.headers.items);
+    const ids = items.map(item => (item._id));
+    const products = await Product.find({ _id: { $in: ids } });
+    for (let i = 0; i < products.length; i++) {
+        products.find(product => {
+            if (product._id == items[i]._id) {
+                products[i] = {...products[i]._doc, qty:items[i].qty};
+                console.log('same')
+            }
+        })
+    };
+    res.send(products)
+})
 router.get("/data/:id", async (req, res) => {
     try {
-        const product = await Product.findOne({ _id: req.params.id })
+        const product = await Product.findOne({ _id: req.params.id });
         res.send(product)
     } catch (error) {
         console.log(error)
@@ -48,7 +61,7 @@ router.put("/add/:id", async (req, res) => {
         if (userDATA) {
             if (filter === undefined || filter.length == 0) {
                 await User.updateOne({ _id: userID }, {
-                    $push: { cart: { image: product.image, name: product.name, price: product.price, brand: product.brand, qty: 1} }
+                    $push: { cart: { image: product.image, name: product.name, price: product.price, brand: product.brand, qty: 1 } }
                 })
                 req.flash("cart-add", "succesful")
                 res.redirect("back")
@@ -72,7 +85,7 @@ router.delete("/delete/:name", async (req, res) => {
         if (userDATA) {
 
             await User.updateOne({ _id: userID }, {
-                $pull: { cart: { image: product.image, name: product.name, price: product.price, brand: product.brand} }
+                $pull: { cart: { image: product.image, name: product.name, price: product.price, brand: product.brand } }
             })
 
             req.flash("cart-add", "succesful")
@@ -91,8 +104,8 @@ router.put("/plus/:name", async (req, res) => {
         const userDATA = await User.findOne({ _id: userID })
 
         if (userDATA) {
-            await User.updateOne({ _id: userID, "cart.name": `${req.params.name}` },{
-                $inc: {"cart.$.qty": +1}
+            await User.updateOne({ _id: userID, "cart.name": `${req.params.name}` }, {
+                $inc: { "cart.$.qty": +1 }
             })
 
             res.redirect("/cart")
@@ -108,15 +121,15 @@ router.put("/min/:name", async (req, res) => {
     try {
         const userID = req.cookies.id
         const userDATA = await User.findOne({ _id: userID })
-        const getElement = await User.findOne({ _id: userID },{
-            cart: {$elemMatch: {name: req.params.name}}
+        const getElement = await User.findOne({ _id: userID }, {
+            cart: { $elemMatch: { name: req.params.name } }
         })
         const getQty = getElement.cart.map(x => x.qty)
 
         if (userDATA) {
-            if(getQty[0] > 1){
-                await User.updateOne({ _id: userID, "cart.name": `${req.params.name}` },{
-                    $inc: {"cart.$.qty": -1}
+            if (getQty[0] > 1) {
+                await User.updateOne({ _id: userID, "cart.name": `${req.params.name}` }, {
+                    $inc: { "cart.$.qty": -1 }
                 })
             }
             res.redirect("/cart")
@@ -132,7 +145,7 @@ router.post("/bill", async (req, res) => {
     try {
         const userID = req.cookies.id
         const userDATA = await User.findOne({ _id: userID })
-        const getOrder = await Order.findOne({ name: userDATA.name}).sort({ Date:-1})
+        const getOrder = await Order.findOne({ name: userDATA.name }).sort({ Date: -1 })
 
         if (userDATA) {
             const { location, area, phone } = req.body
@@ -150,7 +163,7 @@ router.post("/bill", async (req, res) => {
 
             newOrder.forEach((data) => {
                 data.save((error) => {
-                    if(error){
+                    if (error) {
                         console.log(error)
                     } else {
                         res.redirect("/cart/bill")
@@ -158,12 +171,12 @@ router.post("/bill", async (req, res) => {
                 })
             })
 
-            await User.updateOne({ _id: userID}, {
-                $push: { orders: { id: getOrder._id }}
+            await User.updateOne({ _id: userID }, {
+                $push: { orders: { id: getOrder._id } }
             })
 
-            await User.updateOne({ _id: userID}, {
-                $set: { cart: []}
+            await User.updateOne({ _id: userID }, {
+                $set: { cart: [] }
             })
         } else {
 
